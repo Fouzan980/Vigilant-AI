@@ -1,0 +1,106 @@
+# OS files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Editor and IDE
+*.iml
+*.ipr
+*.iws
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+.history
+
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.pyo
+*.pyd
+*.swp
+*.tmp
+*.temp
+*.bak
+*.orig
+*.db
+*.sqlite
+*.sqlite3
+
+# Python
+__pycache__/
+*.py[cod]
+.python-version
+venv/
+venv*/
+env/
+.env
+.env.*
+.Python
+pip-wheel-metadata/
+python_env/
+
+# Docker and local environment
+docker-compose.override.yml
+**/docker-compose.override.yml
+**/.env
+**/.env.local
+**/.env.*
+
+# Flutter / Dart / Pub
+.dart_tool/
+.packages
+.pub/
+.flutter-plugins
+.flutter-plugins-dependencies
+.flutter_export_environment.sh
+**/GeneratedPluginRegistrant.*
+**/flutter_export_environment.sh
+**/ios/Flutter/.last_build_id
+**/doc/api/
+**/build/
+**/coverage/
+
+# Android / Gradle
+**/.gradle/
+**/build/
+**/captures/
+**/outputs/
+**/local.properties
+**/gradle-wrapper.jar
+**/gradle-app.setting
+**/app/*.hprof
+**/android/key.properties
+
+# Node / JavaScript
+**/node_modules/
+**/dist/
+**/build/
+**/.parcel-cache/
+**/.next/
+**/.nuxt/
+**/.vite/
+**/.turbo/
+**/out/
+**/coverage/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Generated service credentials and config
+**/serviceAccountKey.json
+**/google-services.json
+**/GoogleService-Info.plist
+**/credentials.json
+**/secrets.json
+**/private.key
+**/private.pem
+**/firebase-debug.log
+
+# Keep workspace portable
+**/local.properties
+**/.idea/
+**/.vscode/
