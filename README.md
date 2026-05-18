@@ -1,4 +1,5 @@
-# Vigilant AI Monorepo
+# Vigilant AI 
+
 
 Vigilant AI is an AI-powered community safety platform. This monorepo contains the following components:
 
