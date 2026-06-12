@@ -57,7 +57,12 @@ class AuthService {
       try {
         await _dio.post(
           '/users/register',
-          data: {'email': email, 'uid': credential.user?.uid},
+          data: {
+            'id': credential.user?.uid,
+            'email': email,
+            'name': credential.user?.displayName ?? email.split('@').first,
+            'role': 'citizen',
+          },
         );
       } catch (syncError) {
         debugPrint('Backend user sync failed (non-fatal): $syncError');
@@ -106,6 +111,21 @@ class AuthService {
           accessToken: accessToken,
         );
         userCredential = await _auth.signInWithCredential(credential);
+      }
+
+      try {
+        await _dio.post(
+          '/users/register',
+          data: {
+            'id': userCredential.user?.uid,
+            'email': userCredential.user?.email,
+            'name': userCredential.user?.displayName ?? 'Google User',
+            'role': 'citizen',
+            'phone': userCredential.user?.phoneNumber ?? '',
+          },
+        );
+      } catch (syncError) {
+        debugPrint('Backend Google user sync failed (non-fatal): $syncError');
       }
 
       return _mapFirebaseUserToAppUser(userCredential.user);

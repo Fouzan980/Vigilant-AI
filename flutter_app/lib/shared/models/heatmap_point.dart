@@ -1,17 +1,19 @@
+import '../utils/json_readers.dart';
+
 class HeatmapPoint {
-  late double latitude;
-  late double longitude;
-  late double weight;
-  late String category;
+  double latitude = 0;
+  double longitude = 0;
+  double weight = 1;
+  String category = 'unknown';
 
   HeatmapPoint();
 
   factory HeatmapPoint.fromJson(Map<String, dynamic> json) {
     return HeatmapPoint()
-      ..latitude = json['latitude']
-      ..longitude = json['longitude']
-      ..weight = (json['weight'] as num).toDouble()
-      ..category = json['category'];
+      ..latitude = readDouble(json['latitude'])
+      ..longitude = readDouble(json['longitude'])
+      ..weight = readDouble(json['weight'], fallback: 1)
+      ..category = json['category']?.toString() ?? 'unknown';
   }
 
   Map<String, dynamic> toJson() {

@@ -7,6 +7,7 @@ import '../../../shared/widgets/media_picker_row.dart';
 import '../../../core/db/report_entity.dart';
 import '../../../core/api/api_client.dart';
 import '../../../shared/providers/pipeline_providers.dart';
+import '../../../shared/widgets/squish_button.dart';
 
 class ReportScreen extends ConsumerStatefulWidget {
   const ReportScreen({super.key});
@@ -24,6 +25,10 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
   final ImagePicker _picker = ImagePicker();
   final TextEditingController _descController = TextEditingController();
   bool _isSubmitting = false;
+
+  String _normalizeChoice(String value) {
+    return value.replaceAll(' Only', '').replaceAll(' ', '').toLowerCase();
+  }
 
   Future<void> _pickImage() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
@@ -63,24 +68,18 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
       final reportData = {
         'description': _descController.text.trim(),
         'category': _category ?? 'Other',
-        'severity': _severity,
-        'audience': _audience,
+        'subcategory': '',
+        'severity': _normalizeChoice(_severity),
+        'audience': _normalizeChoice(_audience),
         'isAnonymous': _isAnonymous,
-        'createdAt': DateTime.now().toIso8601String(),
+        'status': 'open',
+        'timestamp': DateTime.now().toIso8601String(),
+        'address': 'Unknown location',
+        'location': 'Unknown location',
+        'photoUrls': <String>[],
       };
 
       bool isSynced = false;
-      final reportPipeline = ref.read(reportPipelineProvider);
-      try {
-        await reportPipeline.add({
-          ...reportData,
-          'status': 'open',
-          'location': 'Unknown location',
-        });
-        isSynced = true;
-      } catch (e) {
-        debugPrint('Firestore error while saving report: $e');
-      }
 
       try {
         final apiClient = ref.read(apiClientProvider);
@@ -89,7 +88,14 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
           isSynced = true;
         }
       } catch (e) {
-        debugPrint('Network fallback not available: $e');
+        debugPrint('API submit failed, trying Firestore fallback: $e');
+        try {
+          final reportPipeline = ref.read(reportPipelineProvider);
+          await reportPipeline.add(reportData);
+          isSynced = true;
+        } catch (firestoreError) {
+          debugPrint('Firestore fallback failed: $firestoreError');
+        }
       }
 
       final entity = ReportEntity()
@@ -106,7 +112,7 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
         SnackBar(
           content: Text(
             isSynced
-                ? 'Report sent to Firestore and API.'
+                ? 'Report submitted successfully.'
                 : 'Saved offline. Will sync when online.',
           ),
         ),
@@ -378,14 +384,35 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
             // Submit Button
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: FilledButton(
-                onPressed: _isSubmitting ? null : _submitReport,
-                style: FilledButton.styleFrom(
-                  minimumSize: const Size.fromHeight(52),
+              child: SquishButton(
+                onTap: _isSubmitting ? () {} : _submitReport,
+                child: IgnorePointer(
+                  child: FilledButton(
+                    onPressed: () {},
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size.fromHeight(52),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                    ),
+                    child: _isSubmitting
+                        ? const SizedBox(
+                            height: 24,
+                            width: 24,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text(
+                            'Submit Report',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                  ),
                 ),
-                child: _isSubmitting
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text('Submit Report'),
               ),
             ),
             const SizedBox(height: 8),

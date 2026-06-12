@@ -1,22 +1,37 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/report.dart';
 import '../models/enums.dart';
+import '../providers/pipeline_providers.dart';
+import '../../core/pipelines/report_pipeline.dart';
 
-final reportServiceProvider = Provider((ref) => ReportService());
+final reportServiceProvider = Provider(
+  (ref) => ReportService(ref.watch(reportPipelineProvider)),
+);
 
 class ReportService {
+  final ReportPipeline _pipeline;
+
+  ReportService(this._pipeline);
+
   Future<void> submitReport(Report report, List<String> localPhotoPaths) async {
-    // Stub: Upload photos to Firebase Storage, then save report to Firestore
-    await Future.delayed(const Duration(seconds: 1));
+    final data = report.toJson();
+    data.removeWhere((key, value) => value == null);
+    data['localPhotoPaths'] = localPhotoPaths;
+
+    if (report.id.isEmpty) {
+      await _pipeline.add(data);
+    } else {
+      await _pipeline.set(report.id, data, merge: true);
+    }
   }
 
   Stream<List<Report>> getReportsStream() {
-    // Stub: Stream reports from Firestore
-    return Stream.value([]);
+    return _pipeline.streamAll().map(
+      (items) => items.map((item) => Report.fromJson(item)).toList(),
+    );
   }
 
   Future<void> updateReportStatus(String reportId, ReportStatus status) async {
-    // Stub: Update report status in Firestore
-    await Future.delayed(const Duration(milliseconds: 500));
+    await _pipeline.set(reportId, {'status': status.name}, merge: true);
   }
 }

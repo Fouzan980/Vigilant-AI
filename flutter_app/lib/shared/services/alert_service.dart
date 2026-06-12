@@ -1,16 +1,32 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/alert.dart';
+import '../providers/pipeline_providers.dart';
+import '../../core/pipelines/alert_pipeline.dart';
 
-final alertServiceProvider = Provider((ref) => AlertService());
+final alertServiceProvider = Provider(
+  (ref) => AlertService(ref.watch(alertPipelineProvider)),
+);
 
 class AlertService {
+  final AlertPipeline _pipeline;
+
+  AlertService(this._pipeline);
+
   Stream<List<Alert>> getActiveAlerts() {
-    // Stub: Stream active alerts from Firestore
-    return Stream.value([]);
+    return _pipeline.streamAll().map(
+      (items) => items
+          .map((item) => Alert.fromJson(item))
+          .where((alert) => alert.isActive)
+          .toList(),
+    );
   }
 
   Future<void> createAlert(Alert alert) async {
-    // Stub: Save alert to Firestore and trigger Cloud Function for FCM
-    await Future.delayed(const Duration(seconds: 1));
+    final data = alert.toJson();
+    if (alert.id.isEmpty) {
+      await _pipeline.add(data);
+    } else {
+      await _pipeline.set(alert.id, data, merge: true);
+    }
   }
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../shared/widgets/glass_capsule.dart';
+import '../../../shared/widgets/squish_button.dart';
 
 class SOSScreen extends StatefulWidget {
   const SOSScreen({super.key});
@@ -34,7 +36,6 @@ class _SOSScreenState extends State<SOSScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           children: [
@@ -69,26 +70,29 @@ class _SOSScreenState extends State<SOSScreen>
                     ),
                   ),
                 ),
-                GestureDetector(
-                  onLongPressStart: (_) {},
-                  onLongPressEnd: (_) {},
-                  child: Container(
-                    width: 180,
-                    height: 180,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFFF5252),
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(color: Color(0xFFFF5252), blurRadius: 24),
-                      ],
-                    ),
-                    child: const Center(
-                      child: Text(
-                        'SOS',
-                        style: TextStyle(
-                          fontSize: 40,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                SquishButton(
+                  onTap: () {},
+                  child: GestureDetector(
+                    onLongPressStart: (_) {},
+                    onLongPressEnd: (_) {},
+                    child: Container(
+                      width: 180,
+                      height: 180,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFFF5252),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(color: Color(0xFFFF5252), blurRadius: 24),
+                        ],
+                      ),
+                      child: const Center(
+                        child: Text(
+                          'SOS',
+                          style: TextStyle(
+                            fontSize: 40,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
@@ -151,16 +155,21 @@ class _SOSScreenState extends State<SOSScreen>
             // Cancel Button
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: OutlinedButton(
-                onPressed: () => context.pop(),
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size.fromHeight(52),
-                  side: const BorderSide(color: Color(0xFFFF5252)),
-                  shape: const StadiumBorder(),
-                ),
-                child: const Text(
-                  'I am Safe - Cancel',
-                  style: TextStyle(color: Color(0xFFFF5252)),
+              child: SquishButton(
+                onTap: () => context.pop(),
+                child: IgnorePointer(
+                  child: OutlinedButton(
+                    onPressed: () {},
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(52),
+                      side: const BorderSide(color: Color(0xFFFF5252)),
+                      shape: const StadiumBorder(),
+                    ),
+                    child: const Text(
+                      'I am Safe - Cancel',
+                      style: TextStyle(color: Color(0xFFFF5252)),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -177,20 +186,23 @@ class _SOSScreenState extends State<SOSScreen>
   }
 
   Widget _buildStatusCard(String label, IconData icon, Color color) {
-    return Card(
+    return GlassCapsule(
       color: color.withAlpha(25),
-      elevation: 0,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(icon, color: color, size: 16),
           const SizedBox(width: 8),
-          Text(
-            label,
-            style: TextStyle(
-              color: color,
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
+          Flexible(
+            child: Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],

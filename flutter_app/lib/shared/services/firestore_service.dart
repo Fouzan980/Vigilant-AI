@@ -10,8 +10,21 @@ class FirestoreService {
   CollectionReference<Map<String, dynamic>> collectionRef(String path) =>
       _db.collection(path);
 
-  Stream<List<Map<String, dynamic>>> streamCollection(String path) {
-    return collectionRef(path).snapshots().map(
+  Stream<List<Map<String, dynamic>>> streamCollection(
+    String path, {
+    String? orderBy,
+    bool descending = false,
+    int? limit,
+  }) {
+    Query<Map<String, dynamic>> query = collectionRef(path);
+    if (orderBy != null) {
+      query = query.orderBy(orderBy, descending: descending);
+    }
+    if (limit != null) {
+      query = query.limit(limit);
+    }
+
+    return query.snapshots().map(
       (snap) => snap.docs.map((d) {
         final data = d.data();
         data['id'] = d.id;

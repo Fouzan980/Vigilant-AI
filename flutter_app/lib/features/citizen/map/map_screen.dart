@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../../shared/widgets/heatmap_legend.dart';
+import '../../../shared/widgets/glass_capsule.dart';
+import '../../../shared/widgets/squish_button.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -37,10 +39,13 @@ class _MapScreenState extends State<MapScreen> {
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  const SearchBar(
-                    leading: Icon(Icons.search),
-                    hintText: 'Search area or address',
-                    backgroundColor: WidgetStatePropertyAll(Colors.white),
+                  const GlassCapsule(
+                    child: SearchBar(
+                      leading: Icon(Icons.search),
+                      hintText: 'Search area or address',
+                      backgroundColor: WidgetStatePropertyAll(Colors.transparent),
+                      elevation: WidgetStatePropertyAll(0),
+                    ),
                   ),
                   const SizedBox(height: 8),
                   SingleChildScrollView(
@@ -95,10 +100,13 @@ class _MapScreenState extends State<MapScreen> {
           Positioned(
             bottom: 120,
             right: 16,
-            child: FloatingActionButton(
-              onPressed: () {},
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              child: const Icon(Icons.add, color: Colors.white),
+            child: SquishButton(
+              onTap: () {},
+              child: FloatingActionButton(
+                onPressed: () {},
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                child: const Icon(Icons.add, color: Colors.white),
+              ),
             ),
           ),
 
@@ -108,12 +116,8 @@ class _MapScreenState extends State<MapScreen> {
             minChildSize: 0.15,
             maxChildSize: 0.6,
             builder: (BuildContext context, ScrollController scrollController) {
-              return Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                  boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10)],
-                ),
+              return GlassCapsule(
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
                 child: ListView(
                   controller: scrollController,
                   padding: const EdgeInsets.all(16.0),
@@ -123,7 +127,7 @@ class _MapScreenState extends State<MapScreen> {
                         width: 40,
                         height: 4,
                         decoration: BoxDecoration(
-                          color: Colors.grey[300],
+                          color: Colors.grey[600],
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),

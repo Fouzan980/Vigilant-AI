@@ -6,8 +6,13 @@ class ReportPipeline {
 
   ReportPipeline(this._fs);
 
-  Stream<List<Map<String, dynamic>>> streamAll() =>
-      _fs.streamCollection(collection);
+  Stream<List<Map<String, dynamic>>> streamAll({int limit = 100}) =>
+      _fs.streamCollection(
+        collection,
+        orderBy: 'timestamp',
+        descending: true,
+        limit: limit,
+      );
 
   Future<Map<String, dynamic>?> getById(String id) =>
       _fs.getById(collection, id);

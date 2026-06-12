@@ -1,25 +1,30 @@
 import 'enums.dart';
+import '../utils/json_readers.dart';
 
 class SafetyReport {
-  late String id;
-  late String userId;
-  late double latitude;
-  late double longitude;
-  late FeelingType feelingType;
-  late DateTime timestamp;
-  late String description;
+  String id = '';
+  String userId = '';
+  double latitude = 0;
+  double longitude = 0;
+  FeelingType feelingType = FeelingType.neutral;
+  DateTime timestamp = DateTime.now();
+  String description = '';
 
   SafetyReport();
 
   factory SafetyReport.fromJson(Map<String, dynamic> json) {
     return SafetyReport()
-      ..id = json['id']
-      ..userId = json['userId']
-      ..latitude = json['latitude']
-      ..longitude = json['longitude']
-      ..feelingType = FeelingType.values.byName(json['feelingType'])
-      ..timestamp = DateTime.parse(json['timestamp'])
-      ..description = json['description'];
+      ..id = json['id']?.toString() ?? ''
+      ..userId = json['userId']?.toString() ?? ''
+      ..latitude = readDouble(json['latitude'])
+      ..longitude = readDouble(json['longitude'])
+      ..feelingType = readEnum(
+        FeelingType.values,
+        json['feelingType'],
+        FeelingType.neutral,
+      )
+      ..timestamp = readDateTime(json['timestamp'])
+      ..description = json['description']?.toString() ?? '';
   }
 
   Map<String, dynamic> toJson() {

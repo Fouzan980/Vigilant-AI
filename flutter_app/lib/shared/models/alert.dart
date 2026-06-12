@@ -1,35 +1,40 @@
 import 'enums.dart';
+import '../utils/json_readers.dart';
 
 class Alert {
-  late String id;
-  late String title;
-  late String subtitle;
-  late Severity severity;
-  late double latitude;
-  late double longitude;
-  late double radius;
-  late String type;
-  late String createdBy;
-  late DateTime timestamp;
-  late bool isActive;
-  late Audience targetAudience;
+  String id = '';
+  String title = 'Alert';
+  String subtitle = '';
+  Severity severity = Severity.medium;
+  double latitude = 0;
+  double longitude = 0;
+  double radius = 1000;
+  String type = 'general';
+  String createdBy = 'system';
+  DateTime timestamp = DateTime.now();
+  bool isActive = true;
+  Audience targetAudience = Audience.public;
 
   Alert();
 
   factory Alert.fromJson(Map<String, dynamic> json) {
     return Alert()
-      ..id = json['id']
-      ..title = json['title']
-      ..subtitle = json['subtitle']
-      ..severity = Severity.values.byName(json['severity'])
-      ..latitude = json['latitude']
-      ..longitude = json['longitude']
-      ..radius = (json['radius'] as num).toDouble()
-      ..type = json['type']
-      ..createdBy = json['createdBy']
-      ..timestamp = DateTime.parse(json['timestamp'])
-      ..isActive = json['isActive']
-      ..targetAudience = Audience.values.byName(json['targetAudience']);
+      ..id = json['id']?.toString() ?? ''
+      ..title = json['title']?.toString() ?? 'Alert'
+      ..subtitle = (json['subtitle'] ?? json['description'] ?? '').toString()
+      ..severity = readEnum(Severity.values, json['severity'], Severity.medium)
+      ..latitude = readDouble(json['latitude'])
+      ..longitude = readDouble(json['longitude'])
+      ..radius = readDouble(json['radius'], fallback: 1000)
+      ..type = json['type']?.toString() ?? 'general'
+      ..createdBy = json['createdBy']?.toString() ?? 'system'
+      ..timestamp = readDateTime(json['timestamp'] ?? json['createdAt'])
+      ..isActive = readBool(json['isActive'], fallback: true)
+      ..targetAudience = readEnum(
+        Audience.values,
+        json['targetAudience'],
+        Audience.public,
+      );
   }
 
   Map<String, dynamic> toJson() {

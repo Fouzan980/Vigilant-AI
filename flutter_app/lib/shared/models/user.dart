@@ -1,29 +1,30 @@
 import 'enums.dart';
+import '../utils/json_readers.dart';
 
 class User {
-  late String id;
-  late String name;
-  late String email;
-  late UserRole role;
-  late String district;
-  late String phone;
-  late int reportsCount;
-  late DateTime joinDate;
-  late bool isActive;
+  String id = '';
+  String name = 'Unknown User';
+  String email = '';
+  UserRole role = UserRole.citizen;
+  String district = 'Unknown';
+  String phone = '';
+  int reportsCount = 0;
+  DateTime joinDate = DateTime.now();
+  bool isActive = true;
 
   User();
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User()
-      ..id = json['id']
-      ..name = json['name']
-      ..email = json['email']
-      ..role = UserRole.values.byName(json['role'])
-      ..district = json['district']
-      ..phone = json['phone']
-      ..reportsCount = json['reportsCount']
-      ..joinDate = DateTime.parse(json['joinDate'])
-      ..isActive = json['isActive'];
+      ..id = json['id']?.toString() ?? ''
+      ..name = json['name']?.toString() ?? 'Unknown User'
+      ..email = json['email']?.toString() ?? ''
+      ..role = readEnum(UserRole.values, json['role'], UserRole.citizen)
+      ..district = json['district']?.toString() ?? 'Unknown'
+      ..phone = json['phone']?.toString() ?? ''
+      ..reportsCount = readInt(json['reportsCount'])
+      ..joinDate = readDateTime(json['joinDate'] ?? json['createdAt'])
+      ..isActive = readBool(json['isActive'], fallback: true);
   }
 
   Map<String, dynamic> toJson() {

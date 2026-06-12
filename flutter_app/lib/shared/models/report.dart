@@ -1,41 +1,47 @@
 import 'enums.dart';
+import '../utils/json_readers.dart';
 
 class Report {
-  late String id;
-  late String userId;
-  late String category;
-  late String subcategory;
-  late Severity severity;
-  late String description;
-  late double latitude;
-  late double longitude;
-  late String address;
-  late List<String> photoUrls;
-  late bool isAnonymous;
-  late Audience audience;
-  late ReportStatus status;
-  late DateTime timestamp;
+  String id = '';
+  String userId = 'anonymous';
+  String category = 'Other';
+  String subcategory = '';
+  Severity severity = Severity.medium;
+  String description = '';
+  double latitude = 0;
+  double longitude = 0;
+  String address = 'Unknown location';
+  List<String> photoUrls = [];
+  bool isAnonymous = false;
+  Audience audience = Audience.public;
+  ReportStatus status = ReportStatus.open;
+  DateTime timestamp = DateTime.now();
   String? assignedOfficerId;
 
   Report();
 
   factory Report.fromJson(Map<String, dynamic> json) {
     return Report()
-      ..id = json['id']
-      ..userId = json['userId']
-      ..category = json['category']
-      ..subcategory = json['subcategory']
-      ..severity = Severity.values.byName(json['severity'])
-      ..description = json['description']
-      ..latitude = json['latitude']
-      ..longitude = json['longitude']
-      ..address = json['address']
+      ..id = json['id']?.toString() ?? ''
+      ..userId = json['userId']?.toString() ?? 'anonymous'
+      ..category = json['category']?.toString() ?? 'Other'
+      ..subcategory = json['subcategory']?.toString() ?? ''
+      ..severity = readEnum(Severity.values, json['severity'], Severity.medium)
+      ..description = json['description']?.toString() ?? ''
+      ..latitude = readDouble(json['latitude'])
+      ..longitude = readDouble(json['longitude'])
+      ..address = (json['address'] ?? json['location'] ?? 'Unknown location')
+          .toString()
       ..photoUrls = List<String>.from(json['photoUrls'] ?? [])
-      ..isAnonymous = json['isAnonymous']
-      ..audience = Audience.values.byName(json['audience'])
-      ..status = ReportStatus.values.byName(json['status'])
-      ..timestamp = DateTime.parse(json['timestamp'])
-      ..assignedOfficerId = json['assignedOfficerId'];
+      ..isAnonymous = readBool(json['isAnonymous'])
+      ..audience = readEnum(Audience.values, json['audience'], Audience.public)
+      ..status = readEnum(
+        ReportStatus.values,
+        json['status'],
+        ReportStatus.open,
+      )
+      ..timestamp = readDateTime(json['timestamp'] ?? json['createdAt'])
+      ..assignedOfficerId = json['assignedOfficerId']?.toString();
   }
 
   Map<String, dynamic> toJson() {

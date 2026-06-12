@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../../shared/widgets/vigilant_card.dart';
-import '../../../shared/widgets/safety_score_gauge.dart';
-import '../../../shared/widgets/alert_list_item.dart';
-import '../../../shared/models/alert.dart';
-import '../../../shared/models/enums.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -12,253 +7,215 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            floating: true,
-            snap: true,
-            title: Text(
-              'Vigilant AI',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: Theme.of(context).colorScheme.primary,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 32),
+              _buildHeader(context),
+              const SizedBox(height: 48),
+              _buildSOSButton(context),
+              const SizedBox(height: 48),
+              _buildActionRow(context),
+              const SizedBox(height: 48),
+              _buildMinimalAlerts(context),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Welcome',
+              style: TextStyle(
+                fontSize: 16,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Downtown Area',
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
-            actions: [
-              IconButton(
-                icon: const Badge(
-                  label: Text('2'),
-                  child: Icon(Icons.notifications_none),
-                ),
-                onPressed:
-                    () {}, // Handled by bottom nav usually, but could go to alerts directly
-              ),
-            ],
+          ],
+        ),
+        Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.grey.withOpacity(0.2)),
           ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const SizedBox(height: 16),
-                  _buildGreetingCard(context),
-                  const SizedBox(height: 16),
-                  _buildSafetyScoreCard(context),
-                  const SizedBox(height: 16),
-                  _buildQuickActions(context),
-                  const SizedBox(height: 16),
-                  _buildRecentAlerts(context),
-                  const SizedBox(height: 32),
+          child: const Icon(Icons.person_outline, size: 24),
+        )
+      ],
+    );
+  }
+
+  Widget _buildSOSButton(BuildContext context) {
+    return Center(
+      child: GestureDetector(
+        onTap: () => context.push('/citizen/sos'),
+        child: Container(
+          width: 180,
+          height: 180,
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.error.withOpacity(0.1),
+            shape: BoxShape.circle,
+            border: Border.all(color: Theme.of(context).colorScheme.error.withOpacity(0.3), width: 2),
+          ),
+          child: Center(
+            child: Container(
+              width: 140,
+              height: 140,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.error,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Theme.of(context).colorScheme.error.withOpacity(0.4),
+                    blurRadius: 24,
+                    offset: const Offset(0, 8),
+                  )
                 ],
+              ),
+              child: const Center(
+                child: Text(
+                  'SOS',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 2.0,
+                  ),
+                ),
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionRow(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        _buildCleanAction(context, 'Report', Icons.add, () {}),
+        _buildCleanAction(context, 'Map', Icons.map_outlined, () {}),
+        _buildCleanAction(context, 'Score', Icons.shield_outlined, () => context.push('/citizen/score')),
+      ],
+    );
+  }
+
+  Widget _buildCleanAction(BuildContext context, String title, IconData icon, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.grey.withOpacity(0.2)),
+            ),
+            child: Icon(icon, size: 28, color: Theme.of(context).colorScheme.onSurface),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          )
         ],
       ),
     );
   }
 
-  Widget _buildGreetingCard(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          children: [
-            CircleAvatar(
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              child: const Text('TU', style: TextStyle(color: Colors.white)),
-            ),
-            const SizedBox(width: 16),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Good morning,',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-                Text(
-                  'Test User',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Row(
-                  children: [
-                    const Text(
-                      'Downtown',
-                      style: TextStyle(color: Colors.grey, fontSize: 12),
-                    ),
-                    const SizedBox(width: 4),
-                    Container(
-                      width: 6,
-                      height: 6,
-                      decoration: const BoxDecoration(
-                        color: Colors.green,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSafetyScoreCard(BuildContext context) {
-    return GestureDetector(
-      onTap: () => context.push('/citizen/score'),
-      child: VigilantCard(
-        child: Column(
-          children: [
-            const SafetyScoreGauge(score: 72),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildStatChip(
-                  context,
-                  '12 Reports',
-                  Theme.of(context).colorScheme.primary,
-                ),
-                _buildStatChip(
-                  context,
-                  '2 Alerts',
-                  Theme.of(context).colorScheme.error,
-                ),
-                _buildStatChip(context, '68% Safe', const Color(0xFF2E7D32)),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStatChip(BuildContext context, String label, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withAlpha(25),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Text(
-        label,
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-          color: color,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildQuickActions(BuildContext context) {
-    return Row(
-      children: [
-        _buildQuickActionItem(
-          context,
-          'SOS',
-          Icons.warning_rounded,
-          Theme.of(context).colorScheme.error,
-          () => context.push('/citizen/sos'),
-        ),
-        const SizedBox(width: 8),
-        _buildQuickActionItem(
-          context,
-          'Report',
-          Icons.edit_note_rounded,
-          Theme.of(context).colorScheme.primary,
-          () {},
-        ),
-        const SizedBox(width: 8),
-        _buildQuickActionItem(
-          context,
-          'Alerts',
-          Icons.notifications_active_rounded,
-          const Color(0xFFFF6F00),
-          () {},
-        ),
-        const SizedBox(width: 8),
-        _buildQuickActionItem(
-          context,
-          'Map',
-          Icons.map_rounded,
-          const Color(0xFF00838F),
-          () {},
-        ),
-      ],
-    );
-  }
-
-  Widget _buildQuickActionItem(
-    BuildContext context,
-    String label,
-    IconData icon,
-    Color color,
-    VoidCallback onTap,
-  ) {
+  Widget _buildMinimalAlerts(BuildContext context) {
     return Expanded(
-      child: AspectRatio(
-        aspectRatio: 1,
-        child: Card(
-          elevation: 1,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Recent Alerts',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Icon(Icons.arrow_forward, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
+            ],
           ),
-          child: InkWell(
-            onTap: onTap,
-            borderRadius: BorderRadius.circular(16),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+          const SizedBox(height: 16),
+          Expanded(
+            child: ListView(
+              physics: const BouncingScrollPhysics(),
               children: [
-                Icon(icon, size: 28, color: color),
-                const SizedBox(height: 4),
-                Text(label, style: Theme.of(context).textTheme.labelSmall),
+                _buildAlertRow(context, 'Suspicious Activity', '5m ago', true),
+                const SizedBox(height: 12),
+                _buildAlertRow(context, 'Road Closure', '1h ago', false),
               ],
             ),
-          ),
-        ),
+          )
+        ],
       ),
     );
   }
 
-  Widget _buildRecentAlerts(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Recent Alerts',
-              style: Theme.of(context).textTheme.titleMedium,
+  Widget _buildAlertRow(BuildContext context, String title, String time, bool isUrgent) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.withOpacity(0.1)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(
+              color: isUrgent ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.primary,
+              shape: BoxShape.circle,
             ),
-            TextButton(onPressed: () {}, child: const Text('See All')),
-          ],
-        ),
-        AlertListItem(
-          alert: Alert()
-            ..title = 'Suspicious Activity reported'
-            ..severity = Severity.medium
-            ..timestamp = DateTime.now().subtract(const Duration(minutes: 5)),
-        ),
-        AlertListItem(
-          alert: Alert()
-            ..title = 'Road Closure on 5th Ave'
-            ..severity = Severity.low
-            ..timestamp = DateTime.now().subtract(const Duration(hours: 1)),
-        ),
-        AlertListItem(
-          alert: Alert()
-            ..title = 'Severe Weather Warning'
-            ..severity = Severity.critical
-            ..timestamp = DateTime.now().subtract(const Duration(hours: 2)),
-        ),
-      ],
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+            ),
+          ),
+          Text(
+            time,
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5), fontSize: 14),
+          ),
+        ],
+      ),
     );
   }
 }

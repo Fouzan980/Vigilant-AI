@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   nginx:
     image: nginx:alpine
@@ -16,10 +14,11 @@ services:
       context: ./mern/backend
     ports:
       - "3001:3001"
+    env_file:
+      - .env
     environment:
       - PORT=3001
       - REDIS_URL=redis://redis:6379
-      - FIREBASE_PROJECT_ID=vigilant-ai-dev
     depends_on:
       - redis
 
@@ -28,6 +27,8 @@ services:
       context: ./mern/command-center
     ports:
       - "5173:5173"
+    environment:
+      - VITE_API_BASE_URL=/api/v1
 
   redis:
     image: redis:alpine
@@ -39,3 +40,5 @@ services:
       context: ./ai-model
     ports:
       - "8000:8000"
+    env_file:
+      - .env
